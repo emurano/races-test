@@ -1,0 +1,48 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="race-card.html">
+
+<dom-module id="race-list">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                padding: 10px;
+            }
+
+            @media only screen and (max-width: 575px) {
+
+            }
+        </style>
+
+        <div class="card">
+            <race-card
+                    name="HALL GREEN A8"
+                    race-number="11"
+                    race-close-datetime="{{testDate}}"
+                    location="GBR"></race-card>
+
+            <race-card
+                    name="HALL GREEN A8"
+                    race-number="11"
+                    race-close-datetime="{{testDate}}"></race-card>
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'race-list',
+            properties: {
+                testDate: {
+                    type: Date,
+                    notify: true
+                }
+            },
+
+            ready: function() {
+                this.set('testDate', new Date(2017,2,28, 2, 30));
+                //console.log('testDate', this.testDate);
+            }
+        });
+    </script>
+</dom-module>

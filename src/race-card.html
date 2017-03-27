@@ -1,0 +1,220 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="race-card">
+    <template>
+        <style include="shared-styles">
+            :host {
+                border: 1px solid black;
+                padding: 0;
+                margin: 0;
+                width: 450px;
+                display: inline-block;
+                margin-bottom: 2px;
+            }
+
+            h2 {
+                margin: 0;
+                flex-grow: 1;
+                color: dodgerblue;
+            }
+
+            .top-section {
+                width: 100%;
+                display: flex;
+                flex-direction: row;
+                background-color: #e0e0e0;
+                font-size: 1em;
+                border-bottom: 1px solid #ccc;
+                box-sizing: border-box;
+            }
+
+            .top-section,
+            .bottom-section {
+                padding: 0.25em;
+            }
+
+            .top-section-left {
+                display: flex;
+                flex-direction: column;
+                flex-grow: 1;
+            }
+
+            .top-section-right {
+                display: flex;
+            }
+
+            .date {
+                text-align: left;
+                font-weight: normal;
+                text-size: 0.75em;
+                flex-grow: 1;
+            }
+
+            .race-number {
+                border: 1px solid black;
+                flex-grow: 1;
+                vertical-align: middle;
+            }
+
+            .race-number {
+                display: inline-block;
+                width: 32px;
+                height: 32px;
+                text-align: center;
+                color: dodgerblue;
+                border: 2px solid dodgerblue;
+                border-radius: 50%;
+                background: #ddd;
+                font-size: 15px;
+                line-height: 32px;
+                font-weight: bold;
+            }
+
+            .race-location::before {
+                content: '('
+            }
+
+            .race-location::after {
+                content: ')'
+            }
+
+            .race-time-to-start {
+                font-weight: bold;
+            }
+
+            @media only screen and (max-width: 575px) {
+                :host {
+                    display: block;
+                    width: 100%;
+                }
+            }
+
+            @media only screen and (max-width: 450px) {
+                :host {
+                    display: block;
+                    width: 285px;
+                }
+            }
+        </style>
+
+        <div class="top-section">
+            <span class="top-section-left">
+                <h2>{{name}}</h2>
+                <span class="date">{{raceStartDate}} @ {{raceStartTime}}</span>
+            </span>
+
+            <span class="top-section-right">
+                <span class="race-number">{{raceNumber}}</span>
+                <template is="dom-if" dom-if="[[_locationSet(location)]]">
+                    <span class="race-location">{{location}}</span>
+                </template>
+            </span>
+        </div>
+
+        <div class="bottom-section">
+            <span class="race-time-to-start-container">
+                <span class="race-time-to-start-label">Closes in </span>
+                <span class="race-time-to-start">{{raceTimeToClose}}</span>
+            </span>
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'race-card',
+            properties: {
+                name: {type: String},
+                raceNumber: {type: String},
+                raceCloseDatetime: {
+                    type: Date,
+                    notify: true
+                },
+                raceStartDate: {
+                    type: String,
+                    notify: true,
+                    computed: 'formatDate(raceCloseDatetime)'
+                },
+                raceStartTime: {
+                    type: String,
+                    notify: true,
+                    computed: 'formatTime(raceCloseDatetime)'
+                },
+                raceTimeToStart: {
+                    type: String,
+                    notify: true
+                },
+                location: {
+                    type: String,
+                    notify: true
+                },
+                currentDate: {
+                    type: Date,
+                    notify: true,
+                    default: new Date()
+                }
+            },
+
+            observers: [
+                'formatTimeToClose(raceCloseDatetime, currentDate)'
+            ],
+
+            ready: function () {
+                this.set('currentDate', new Date());
+                this.set('raceCloseDatetime', new Date());
+                console.log('currentDate', this.currentDate);
+                console.log('raceCloseDatetime', this.raceCloseDatetime);
+            },
+
+            formatDate: function (raceCloseDatetime) {
+                if (raceCloseDatetime != null) {
+                    return raceCloseDatetime.toLocaleDateString();
+                }
+                return null;
+            },
+
+            formatTime: function (raceCloseDatetime) {
+                if (raceCloseDatetime != null) {
+                    return raceCloseDatetime.getHours()
+                        + ':'
+                        + raceCloseDatetime.getMinutes()
+                        + (raceCloseDatetime.getMinutes() > 12 ? 'pm' : 'am');
+                }
+                return null;
+            },
+
+            formatTimeToClose: function (raceCloseDatetime, currentDate) {
+                if (currentDate != null && raceCloseDatetime != null) {
+                    var dif = raceCloseDatetime.getTime() - currentDate.getTime();
+                    var seconds =  Math.floor(dif / 1000);
+                    this.set('raceTimeToClose', this.secondsToString(seconds));
+                } else {
+                    this.set('raceTimeToClose', '-');
+                }
+            },
+
+            secondsToString: function (seconds) {
+                var parts = [];
+                parts.push([Math.floor(seconds / 31536000), 'y']);
+                parts.push([Math.floor((seconds % 31536000) / 86400), 'd']);
+                parts.push([Math.floor(((seconds % 31536000) % 86400) / 3600), 'h']);
+                parts.push([Math.floor((((seconds % 31536000) % 86400) % 3600) / 60), 'm']);
+                parts.push([(((seconds % 31536000) % 86400) % 3600) % 60, 's']);
+
+                var shownParts = [];
+                for (var i = 0; i < parts.length; i++) {
+                    if (parts[i][0] > 0) {
+                        shownParts.push(parts[i][0] + parts[i][1]);
+                    }
+                    if (shownParts.length >= 2) break;
+                }
+
+                return shownParts.join(' ');
+            },
+
+            _locationSet: function (location) {
+                return location !== null && location.length > 0;
+            }
+        });
+    </script>
+</dom-module>
