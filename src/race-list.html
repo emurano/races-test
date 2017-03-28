@@ -1,6 +1,8 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="shared-styles.html">
 <link rel="import" href="race-card.html">
+<link rel="import" href="race-list-data.html">
 
 <dom-module id="race-list">
     <template>
@@ -10,23 +12,52 @@
                 padding: 10px;
             }
 
+            ul.race-list {
+                padding: 0;
+            }
+            ul.race-list > li {
+                display: block;
+                padding: 0;
+                margin: 0;
+            }
+
             @media only screen and (max-width: 575px) {
 
             }
         </style>
 
         <div class="card">
-            <race-card
-                    name="HALL GREEN A8"
-                    race-number="11"
-                    race-close-datetime="{{testDate}}"
-                    location="GBR"></race-card>
 
-            <race-card
-                    name="HALL GREEN A8"
-                    race-number="11"
-                    race-close-datetime="{{testDate}}"></race-card>
+            <ul class="race-list">
+            <template is="dom-repeat"
+                      id="raceListRepeat"
+                      items="[[filterRaces(displayData.races, currentDate)]]"
+                      as="race">
+                <li>
+                <race-card
+                        name="{{race.raceName}}"
+                        race-number="{{race.raceNumber}}"
+                        race-close-datetime="{{getDateFromString(race.raceStartTime)}}"
+                        location="{{race.meeting.location}}"
+                        on-closed="_onClosed"
+                        schedule-type="{{race.meeting.sellCode.scheduledType}}"
+                        current-date="{{currentDate}}"></race-card>
+                </li>
+            </template>
+            </ul>
         </div>
+
+
+        <race-list-data data="{{displayData}}"></race-list-data>
+
+        <!--<iron-ajax-->
+                <!--auto-->
+                <!--url="https://api.beta.tab.com.au/v1/tab-info-service/racing/next-to-go/races"-->
+                <!--params='{"jurisdiction":"NSW"}'-->
+                <!--handle-as="json"-->
+                <!--on-response="_handleResponse"-->
+                <!--debounce-duration="300"></iron-ajax>-->
+
     </template>
 
     <script>
@@ -36,12 +67,68 @@
                 testDate: {
                     type: Date,
                     notify: true
+                },
+                testDate2: {
+                    type: Date,
+                    notify: true
+                },
+
+                displayData: {
+                    type: Object,
+                    notify: true,
+                    default: {}
+                },
+
+                currentDate: {
+                    type: Date,
+                    notify: true,
+                    default: null
                 }
             },
 
+            getDateFromString: function(dateString) {
+                return new Date(dateString);
+            },
+
             ready: function() {
-                this.set('testDate', new Date(2017,2,28, 2, 30));
-                //console.log('testDate', this.testDate);
+                this.set('currentDate', new Date());
+                this.resetTimer();
+            },
+
+            resetTimer: function () {
+                this.async(function() {
+                    this.set('currentDate', new Date());
+                    this.resetTimer();
+                }, 1000)
+            },
+
+            _onClosed: function(e) {
+                console.log('_onClosed', e);
+            },
+
+            _handleResponse: function(e) {
+                console.log(e);
+            },
+
+            filterRaces: function(races) {
+                var currentDate = new Date();
+                var filtered = races.filter(function(race){
+                    var raceStartTime = new Date(race.raceStartTime);
+                    if (raceStartTime.getTime() > currentDate.getTime()) {
+                        return true;
+                    }
+                    return false;
+                });
+
+                var sorted = filtered.sort(function(a, b) {
+                    var aRaceStartTime = new Date(a.raceStartTime);
+                    var bRaceStartTime = new Date(b.raceStartTime);
+                    if (aRaceStartTime < bRaceStartTime) return -1;
+                    if (aRaceStartTime > bRaceStartTime) return 1;
+                    if (aRaceStartTime == bRaceStartTime) return 0;
+                });
+
+                return sorted.slice(0, 5);
             }
         });
     </script>
