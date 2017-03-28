@@ -179,13 +179,13 @@
                     notify: true
                 },
 
-                scheduleType: {
+                raceType: {
                     type: String,
                     notify: true,
                     default: ''
                 },
 
-                scheduleTypes: {
+                raceTypes: {
                     type: Object,
                     notify: true,
                     default: {
@@ -195,9 +195,9 @@
                     }
                 },
 
-                scheduleTypeName: {
+                raceTypeName: {
                     type: String,
-                    computed: 'getScheduleTypeName(scheduleType)',
+                    computed: 'getScheduleTypeName(raceType)',
                     notify: true
                 }
             },
@@ -207,7 +207,7 @@
             ],
 
             ready: function () {
-                this.notifyPath('scheduleType');
+                this.notifyPath('raceType');
             },
 
             formatDate: function (raceCloseDatetime) {
@@ -269,13 +269,13 @@
                 return seconds != null && seconds > 0;
             },
 
-            getScheduleTypeName: function(scheduleType){
-                var scheduleTypes = {
+            getScheduleTypeName: function(raceType){
+                var raceTypes = {
                     'R': { name: "Horses"},
                     'G': { name: "Greyhounds"},
                     'H': { name: "Harness"}
                 };
-                var name = scheduleTypes[scheduleType]['name'];
+                var name = raceTypes[raceType]['name'];
                 return name;
             }
         });

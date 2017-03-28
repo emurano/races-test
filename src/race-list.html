@@ -42,13 +42,11 @@
                             race-number="{{race.raceNumber}}"
                             race-close-datetime="{{getDateFromString(race.raceStartTime)}}"
                             location="{{race.meeting.location}}"
-                            schedule-type="{{race.meeting.sellCode.scheduledType}}"
+                            race-type="{{race.meeting.raceType}}"
                             current-date="{{currentDate}}"></race-card>
                 </li>
             </template>
         </ul>
-
-
     </template>
 
     <script>

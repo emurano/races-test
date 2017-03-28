@@ -54,7 +54,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </div>
         </template>
 
-
         <race-list-data data="{{displayData}}"></race-list-data>
 
         <div class="card">
@@ -109,7 +108,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             filterGreyhoundRaces: function (data) {
                 var races = data.races;
                 var filtered = races.filter(function (race) {
-                    return race.meeting.sellCode.scheduledType == 'G';
+                    return race.meeting.raceType == 'G';
                 });
                 return {races: filtered};
             },
@@ -117,7 +116,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             filterHarnessRaces: function (data) {
                 var races = data.races;
                 var filtered = races.filter(function (race) {
-                    return race.meeting.sellCode.scheduledType == 'H';
+                    return race.meeting.raceType == 'H';
                 });
                 return {races: filtered};
             },
@@ -125,7 +124,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             filterHorseRaces: function (data) {
                 var races = data.races;
                 var filtered = races.filter(function (race) {
-                    return race.meeting.sellCode.scheduledType == 'R';
+                    return race.meeting.raceType == 'R';
                 });
                 return {races: filtered};
             },
