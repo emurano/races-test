@@ -5,18 +5,23 @@
     <template>
         <style include="shared-styles">
             :host {
-                border: 1px solid black;
+                /*border: 1px solid #ccc;*/
                 padding: 0;
                 margin: 0;
                 display: block;
-                margin-bottom: 2px;
+                /*margin-bottom: 2px;*/
+                background-color: #fff;
+                border-bottom: 1px solid #ddd;
+
             }
 
             h2 {
                 margin: 0;
+                margin-left: 5px;
                 flex-grow: 1;
-                color: dodgerblue;
+                color: black;
                 font-size: 20px;
+                line-height: 32px;
             }
 
             .top-section {
@@ -24,24 +29,19 @@
                 display: flex;
                 flex-direction: row;
                 font-size: 1em;
-                border-bottom: 1px solid #ccc;
                 box-sizing: border-box;
-            }
-
-            .top-section,
-            .bottom-section {
                 padding: 0.25em;
             }
 
             .top-section-left {
                 display: flex;
-                flex-direction: column;
+                flex-direction: row;
                 flex-grow: 1;
             }
 
             .top-section-right {
                 display: flex;
-                flex-direction: column;
+                flex-direction: row;
                 text-align: right;
             }
 
@@ -58,21 +58,17 @@
                 flex-grow: 1;
             }
             .race-number {
-                border: 1px solid black;
                 vertical-align: middle;
-            }
-
-            .race-number {
                 display: inline-block;
                 width: 32px;
                 height: 32px;
                 max-width: 32px;
                 max-height: 32px;
                 text-align: center;
-                color: dodgerblue;
-                border: 2px solid dodgerblue;
+                color: black;
+                border: 2px solid black;
                 border-radius: 50%;
-                background: #ddd;
+                background: white;
                 font-size: 15px;
                 line-height: 32px;
                 font-weight: bold;
@@ -86,10 +82,23 @@
                 content: ')'
             }
 
+            race-time-closed {
+                color: red;
+            }
 
-
+            .race-time-closed,
             .race-time-to-start {
                 font-weight: bold;
+                font-size: 1.5em;
+            }
+
+            .race-time-to-start-container {
+                width: 200px;
+            }
+
+            .race-schedule-type {
+                width: 125px;
+                text-align: center;
             }
 
             @media only screen and (max-width: 575px) {
@@ -109,31 +118,35 @@
 
         <div class="top-section">
             <span class="top-section-left">
+                <span class="race-number">R{{raceNumber}}</span>
                 <h2>{{name}}</h2>
-                <span class="date">{{raceStartDate}} @ {{raceStartTime}}</span>
             </span>
 
             <span class="top-section-right">
-                <span class="race-number">R{{raceNumber}}</span>
-                <template is="dom-if" if="[[locationSet(location)]]">
-                    <span class="race-location">{{location}}</span>
+                    <span class="date">{{raceStartDate}} @ {{raceStartTime}}</span>
+
+                    <template is="dom-if" if="[[locationSet(location)]]">
+                        <span class="race-location">{{location}}</span>
+                    </template>
                     <span class="race-schedule-type">{{scheduleTypeName}}</span>
-                </template>
+
+                    <span class="race-time-to-start-container">
+                        <template is="dom-if" if="{{!closesInFuture(raceCloseDatetime, currentDate)}}">
+                            <span class="race-time-closed">Closed</span>
+                        </template>
+
+                        <template is="dom-if" if="{{closesInFuture(raceCloseDatetime, currentDate)}}">
+                            <!--<span class="race-time-to-start-label">Closes in </span>-->
+                            <span class="race-time-to-start">{{raceTimeToClose}}</span>
+                        </template>
+                    </span>
+                </span>
             </span>
+
         </div>
 
-        <div class="bottom-section">
-            <span class="race-time-to-start-container">
-                <template is="dom-if" if="{{!closesInFuture(raceCloseDatetime, currentDate)}}">
-                    <span class="race-time-closed">Closed</span>
-                </template>
-
-                <template is="dom-if" if="{{closesInFuture(raceCloseDatetime, currentDate)}}">
-                    <span class="race-time-to-start-label">Closes in </span>
-                    <span class="race-time-to-start">{{raceTimeToClose}}</span>
-                </template>
-            </span>
-        </div>
+        <!--<div class="bottom-section">-->
+        <!--</div>-->
     </template>
 
     <script>
@@ -168,14 +181,16 @@
                     type: Date,
                     notify: true
                 },
+
                 scheduleType: {
                     type: String,
                     notify: true,
-                    default: null
+                    default: ''
                 },
 
-                scheduledTypes: {
+                scheduleTypes: {
                     type: Object,
+                    notify: true,
                     default: {
                         'R': { name: "Horses"},
                         'G': { name: "Greyhounds"},
@@ -185,7 +200,7 @@
 
                 scheduleTypeName: {
                     type: String,
-                    computed: 'getScheduleTypeName(scheduleType, scheduleTypes)',
+                    computed: 'getScheduleTypeName(scheduleType)',
                     notify: true
                 }
             },
@@ -195,7 +210,10 @@
             ],
 
             ready: function () {
-                this.set('raceCloseDatetime', new Date());
+                //this.set('raceCloseDatetime', new Date());
+
+                console.log('scheduleType', this.scheduleType);
+                this.notifyPath('scheduleType');
             },
 
             formatDate: function (raceCloseDatetime) {
@@ -267,7 +285,12 @@
                 return seconds != null && seconds < 0;
             },
 
-            getScheduleTypeName: function(scheduleType, scheduleTypes){
+            getScheduleTypeName: function(scheduleType){
+                var scheduleTypes = {
+                    'R': { name: "Horses"},
+                    'G': { name: "Greyhounds"},
+                    'H': { name: "Harness"},
+                };
                 var name = scheduleTypes[scheduleType]['name'];
                 return name;
             }

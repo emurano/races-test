@@ -19,6 +19,9 @@
                 display: block;
                 padding: 0;
                 margin: 0;
+
+                box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+                transform: scaleX(.92) translate3d(0, 0, 0);
             }
 
             @media only screen and (max-width: 575px) {
@@ -27,7 +30,6 @@
         </style>
 
         <div class="card">
-
             <ul class="race-list">
             <template is="dom-repeat"
                       id="raceListRepeat"
@@ -47,17 +49,7 @@
             </ul>
         </div>
 
-
         <race-list-data data="{{displayData}}"></race-list-data>
-
-        <!--<iron-ajax-->
-                <!--auto-->
-                <!--url="https://api.beta.tab.com.au/v1/tab-info-service/racing/next-to-go/races"-->
-                <!--params='{"jurisdiction":"NSW"}'-->
-                <!--handle-as="json"-->
-                <!--on-response="_handleResponse"-->
-                <!--debounce-duration="300"></iron-ajax>-->
-
     </template>
 
     <script>
