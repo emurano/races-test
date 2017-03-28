@@ -1,8 +1,8 @@
 var http = require('http');
 
 var randomRaceType = function() {
-    let types = [ 'R', 'H', 'G' ];
-    let randomIndex = randomNumber(0, types.length - 1);
+    var types = [ 'R', 'H', 'G' ];
+    var randomIndex = randomNumber(0, types.length - 1);
     return types[randomIndex];
 };
 
@@ -11,12 +11,12 @@ var randomNumber = function(min, max) {
 };
 
 var randomDate = function (min, max) {
-    let currentDate = new Date();
-    return new Date(currentDate.getTime() + ( Math.floor(Math.random() * (max - min + 1)) + min));
+    var currentDate = new Date();
+    return new Date(currentDate.getTime() + ( Math.floor(Math.random() * (max - min + 1)) + min - (max / 2)));
 };
 
 var randomRaceName = function() {
-    let words = [
+    var words = [
         'GRANDNATIONAL',
         '2017',
         'HANDICAP HURDLE',
@@ -36,43 +36,43 @@ var randomRaceName = function() {
         'HEXHAM'
     ];
 
-    let wordList = [];
-    let numWords = randomNumber(1, 5);
+    var wordList = [];
+    var numWords = randomNumber(1, 5);
     for (var i = 0; i < numWords; i++) {
-        let randomIndex = randomNumber(0, words.length - 1);
+        var randomIndex = randomNumber(0, words.length - 1);
         wordList.push(words[randomIndex]);
     }
     return wordList.join(' ');
 }
 
 var randomLocation = function() {
-    let locations = [ 'GBR', 'FRA', 'ZAF' ];
-    let randomIndex = randomNumber(0, locations.length - 1);
+    var locations = [ 'GBR', 'FRA', 'ZAF' ];
+    var randomIndex = randomNumber(0, locations.length - 1);
     return locations[randomIndex];
 };
 
 var generateRandomRace = function() {
 
 
-    let raceDate = randomDate(1, 1000000);
-    let race = {
+    var raceDate = randomDate(1, 1000000);
+    var race = {
         "raceStartTime": raceDate.toISOString(), // "2017-03-28T13:50:00.000Z",
         "raceNumber": randomNumber(1, 20),
         "raceName": randomRaceName(),
-        "raceDistance": 1800,
-        "broadcastChannel": "Sky Racing 1",
-        "broadcastChannels": [
-            "Sky Racing 1"
-        ],
+        // "raceDistance": 1800,
+        // "broadcastChannel": "Sky Racing 1",
+        // "broadcastChannels": [
+        //     "Sky Racing 1"
+        // ],
         "meeting": {
             "raceType": randomRaceType(),
-            "meetingName": "WOLVERHAMPTON",
+            // "meetingName": "WOLVERHAMPTON",
             "location": randomLocation(),
-            "weatherCondition": "OCAST",
-            "trackCondition": "AWT",
-            "railPosition": "True",
-            "venueMnemonic": "WOL",
-            "meetingDate": "2017-03-28"
+            // "weatherCondition": "OCAST",
+            // "trackCondition": "AWT",
+            // "railPosition": "True",
+            // "venueMnemonic": "WOL",
+            // "meetingDate": "2017-03-28"
         }
     };
 
@@ -84,7 +84,7 @@ var server = http.createServer(function(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
 
 
-    let data = { races: [] };
+    var data = { races: [] };
 
     for (var i = 0; i < 100; i++) {
         data.races.push(generateRandomRace());
