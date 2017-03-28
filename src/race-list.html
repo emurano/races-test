@@ -15,12 +15,13 @@
             ul.race-list {
                 padding: 0;
             }
+
             ul.race-list > li {
                 display: block;
                 padding: 0;
                 margin: 0;
 
-                box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+                box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
                 transform: scaleX(.92) translate3d(0, 0, 0);
             }
 
@@ -29,27 +30,25 @@
             }
         </style>
 
-        <div class="card">
-            <ul class="race-list">
+
+        <ul class="race-list">
             <template is="dom-repeat"
                       id="raceListRepeat"
-                      items="[[filterRaces(displayData.races, currentDate)]]"
+                      items="[[filterRaces(displayData.races, currentDate, limitTo)]]"
                       as="race">
                 <li>
-                <race-card
-                        name="{{race.raceName}}"
-                        race-number="{{race.raceNumber}}"
-                        race-close-datetime="{{getDateFromString(race.raceStartTime)}}"
-                        location="{{race.meeting.location}}"
-                        on-closed="_onClosed"
-                        schedule-type="{{race.meeting.sellCode.scheduledType}}"
-                        current-date="{{currentDate}}"></race-card>
+                    <race-card
+                            name="{{race.raceName}}"
+                            race-number="{{race.raceNumber}}"
+                            race-close-datetime="{{getDateFromString(race.raceStartTime)}}"
+                            location="{{race.meeting.location}}"
+                            schedule-type="{{race.meeting.sellCode.scheduledType}}"
+                            current-date="{{currentDate}}"></race-card>
                 </li>
             </template>
-            </ul>
-        </div>
+        </ul>
 
-        <race-list-data data="{{displayData}}"></race-list-data>
+
     </template>
 
     <script>
@@ -67,6 +66,7 @@
 
                 displayData: {
                     type: Object,
+                    reflectToAttribute: true,
                     notify: true,
                     default: {}
                 },
@@ -75,44 +75,41 @@
                     type: Date,
                     notify: true,
                     default: null
+                },
+
+                limitTo: {
+                    type: Number,
+                    notify: true,
+                    default: 5
                 }
             },
 
-            getDateFromString: function(dateString) {
+            getDateFromString: function (dateString) {
                 return new Date(dateString);
             },
 
-            ready: function() {
+            ready: function () {
                 this.set('currentDate', new Date());
+                if (this.limitTo == undefined) {
+                    this.set('limitTo', 5);
+                }
                 this.resetTimer();
             },
 
             resetTimer: function () {
-                this.async(function() {
+                this.async(function () {
                     this.set('currentDate', new Date());
                     this.resetTimer();
                 }, 1000)
             },
 
-            _onClosed: function(e) {
-                console.log('_onClosed', e);
-            },
-
-            _handleResponse: function(e) {
-                console.log(e);
-            },
-
-            filterRaces: function(races) {
-                var currentDate = new Date();
-                var filtered = races.filter(function(race){
+            filterRaces: function (races, currentDate, limitTo) {
+                var filtered = races.filter(function (race) {
                     var raceStartTime = new Date(race.raceStartTime);
-                    if (raceStartTime.getTime() > currentDate.getTime()) {
-                        return true;
-                    }
-                    return false;
+                    return (raceStartTime.getTime() > currentDate.getTime());
                 });
 
-                var sorted = filtered.sort(function(a, b) {
+                var sorted = filtered.sort(function (a, b) {
                     var aRaceStartTime = new Date(a.raceStartTime);
                     var bRaceStartTime = new Date(b.raceStartTime);
                     if (aRaceStartTime < bRaceStartTime) return -1;
@@ -120,7 +117,7 @@
                     if (aRaceStartTime == bRaceStartTime) return 0;
                 });
 
-                return sorted.slice(0, 5);
+                return sorted.slice(0, limitTo);
             }
         });
     </script>

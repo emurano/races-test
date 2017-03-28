@@ -14,59 +14,125 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="shared-styles.html">
 <link rel="import" href="race-list.html">
 <link rel="import" href="my-icons.html">
 
 <dom-module id="my-app">
-  <template>
-    <style>
-      :host {
-        --app-primary-color: #4285f4;
-        --app-secondary-color: black;
+    <template>
+        <style include="shared-styles">
+            :host {
+                --app-primary-color: #4285f4;
+                --app-secondary-color: black;
 
-        display: block;
-      }
-    </style>
+                display: block;
+            }
 
-    <!--<app-location route="{{route}}"></app-location>-->
-    <!--<app-route-->
-        <!--route="{{route}}"-->
-        <!--pattern="/:page"-->
-        <!--data="{{routeData}}"-->
-        <!--tail="{{subroute}}"></app-route>-->
+            h2 {
+                margin: 0;
+            }
+        </style>
 
-    <race-list name="view1"></race-list>
+        <template is="dom-if" if="{{anyRaces(horseRaces)}}">
+            <div class="card">
+                <h2>Horse Races</h2>
+                <race-list name="view1" limit-to="{{limitTo}}" display-data="{{horseRaces}}"></race-list>
+            </div>
+        </template>
 
-  </template>
+        <template is="dom-if" if="{{anyRaces(harnessRaces)}}">
+            <div class="card">
+                <h2>Harness Races</h2>
+                <race-list name="view1" limit-to="{{limitTo}}" display-data="{{harnessRaces}}"></race-list>
+            </div>
+        </template>
 
-  <script>
-    Polymer({
-      is: 'my-app',
+        <template is="dom-if" if="{{anyRaces(greyhoundRaces)}}">
+            <div class="card">
+                <h2>Greyhound Races</h2>
+                <race-list name="view1" limit-to="{{limitTo}}" display-data="{{greyhoundRaces}}"></race-list>
+            </div>
+        </template>
 
-      properties: {
-        page: {
-          type: String,
-          reflectToAttribute: true
-        },
-      }
 
-//      observers: [
-//        '_routePageChanged(routeData.page)',
-//      ],
+        <race-list-data data="{{displayData}}"></race-list-data>
 
-//      _routePageChanged: function(page) {
-//        this.page = page || 'view1';
-//      },
-//
-//      _pageChanged: function(page) {
-//        // Load page import on demand. Show 404 page if fails
-//        var resolvedPageUrl = this.resolveUrl('my-' + page + '.html');
-//        this.importHref(resolvedPageUrl, null, this._showPage404, true);
-//      },
-//
-//      _showPage404: function() {
-//        this.page = 'view404';
-//      },
-    });
-  </script>
+        <div class="card">
+            <label for="num-per-group">Limit To:</label>
+            <input id="num-per-group" type="text" value="{{limitTo::change}}"/>
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'my-app',
+
+            properties: {
+                page: {
+                    type: String,
+                    reflectToAttribute: true
+                },
+
+                limitTo: {
+                    type: String,
+                    reflectToAttribute: true,
+                    notify: true,
+                    value: '5'
+                },
+
+                displayData: {
+                    type: Object,
+                    notify: true,
+                    default: {}
+                },
+
+                horseRaces: {
+                    type: Object,
+                    notify: true,
+                    default: {},
+                    computed: 'filterHorseRaces(displayData)'
+                },
+                harnessRaces: {
+                    type: Object,
+                    notify: true,
+                    default: {},
+                    computed: 'filterHarnessRaces(displayData)'
+                },
+                greyhoundRaces: {
+                    type: Object,
+                    notify: true,
+                    default: {},
+                    computed: 'filterGreyhoundRaces(displayData)'
+                }
+            },
+
+            filterGreyhoundRaces: function (data) {
+                var races = data.races;
+                var filtered = races.filter(function (race) {
+                    return race.meeting.sellCode.scheduledType == 'G';
+                });
+                return {races: filtered};
+            },
+
+            filterHarnessRaces: function (data) {
+                var races = data.races;
+                var filtered = races.filter(function (race) {
+                    return race.meeting.sellCode.scheduledType == 'H';
+                });
+                return {races: filtered};
+            },
+
+            filterHorseRaces: function (data) {
+                var races = data.races;
+                var filtered = races.filter(function (race) {
+                    return race.meeting.sellCode.scheduledType == 'R';
+                });
+                return {races: filtered};
+            },
+
+            anyRaces: function (races) {
+                return races.races.length > 0;
+            }
+        });
+    </script>
 </dom-module>
