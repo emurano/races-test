@@ -1,5 +1,24 @@
 I used the Polymer starter kit to start the project off.
 
+These are the files I worked on:
+
+* backend/generate-data,js - a nodejs back end that generates a bunch of races with random names, start times etc
+* my-app.html - The 'page' component. This component create three different race lists (Horses, Harnesses and
+Greyhounds) and feeds each a filtered array. Each array is based on the data returned from the back end
+* race-list-data.html - Encapulates the ajax call. When loaded the component will fire off an ajax call straight away.
+Whenever an ajax call completes the component creates a two minute delay before reloading the list. The my-app
+component binds to race-list-data's data property to whenever that property is updated with new data from the server,
+my-app automatically filters the data into groups.
+* race-list.html - Component that further filters the race list to remove any races that have already started/closed.
+Every second race-list will update the 'currentDate' properties which in turn updates the filtered list, which in turn
+removes any race that has already closed.
+* race-card.html - Displays the race information along with the count down timer. The timer updates whenever
+'currentDate' is updated by race-list.
+
+The whole idea is to use data binding so that when data is updated, the UI takes action and changes itself to match the
+new data.
+
+
 ### Setup
 
 ##### Prerequisites
