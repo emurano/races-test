@@ -22,12 +22,15 @@ I've left some of the original readme file below in case you don't have the Poly
 the Polymer CLI installed then the these are the steps to launch the application locally:
 
 To start the random race generator backend:
+
     node backend/generate-data.js
 
 To download the Polymer application's dependencies:
+
     bower install
 
 To start the Polymer application:
+
     polymer serve --open
 
 
